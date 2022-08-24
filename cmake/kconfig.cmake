@@ -73,11 +73,21 @@ set(EXTRA_KCONFIG_TARGET_COMMAND_FOR_hardenconfig
   )
 
 add_custom_target(guiconfig ALL)
+add_custom_target(menuconfig ALL)
+
 add_custom_command(
   TARGET   guiconfig
   COMMAND  cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib  
   COMMAND  ${PYTHON_EXECUTABLE} guiconfig.py ${CMAKE_SOURCE_DIR}/configs/Kconfig
 )
+
+add_custom_command(
+  TARGET   menuconfig
+  COMMAND  USES_TERMINAL
+  COMMAND  cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib  
+  COMMAND  ${PYTHON_EXECUTABLE} menuconfig.py ${CMAKE_SOURCE_DIR}/configs/Kconfig
+)
+
 
 # foreach(kconfig_target
 #     menuconfig
