@@ -60,3 +60,10 @@ config CPP_STATIC_INIT_GNU
 	  GNU-compatible initialization of CPP static objects
 
 endif # CPLUSPLUS
+
+
+config TEST_OPTION
+	bool "enable testing"
+	default n
+	help
+	  Enables unit tests
