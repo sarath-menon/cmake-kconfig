@@ -36,7 +36,7 @@ set(DOTCONFIG                  ${CMAKE_SOURCE_DIR}/configs/.config)
 # set(ENV{KCONFIG_BASE}       ${PROJECT_ROOT})
 # set(ENV{KERNELVERSION}      ${KERNELVERSION})
 # set(ENV{KCONFIG_CONFIG}     ${DOTCONFIG})
-# set(ENV{PYTHON_EXECUTABLE}  ${PYTHON_EXECUTABLE})
+set(ENV{PYTHON_EXECUTABLE}  ${PYTHON_EXECUTABLE})
 
 # # Set environment variables so that Kconfig can prune Kconfig source
 # # files for other architectures
@@ -60,17 +60,24 @@ set(DOTCONFIG                  ${CMAKE_SOURCE_DIR}/configs/.config)
 # # cmake -DEXTRA_KCONFIG_TARGETS=cli
 # # -DEXTRA_KCONFIG_TARGET_COMMAND_FOR_cli=cli_kconfig_frontend.py
 
-# set(EXTRA_KCONFIG_TARGET_COMMAND_FOR_menuconfig
-#   ${PROJECT_ROOT}/scripts/kconfig/menuconfig.py
-#   )
+set(EXTRA_KCONFIG_TARGET_COMMAND_FOR_menuconfig
+  ${PROJECT_ROOT}/scripts/kconfig/menuconfig.py
+  )
 
-# set(EXTRA_KCONFIG_TARGET_COMMAND_FOR_guiconfig
-#   ${PROJECT_ROOT}/scripts/kconfig/guiconfig.py
-#   )
+set(EXTRA_KCONFIG_TARGET_COMMAND_FOR_guiconfig
+  ${PROJECT_ROOT}/scripts/kconfig/guiconfig.py
+  )
 
-# set(EXTRA_KCONFIG_TARGET_COMMAND_FOR_hardenconfig
-#   ${PROJECT_ROOT}/scripts/kconfig/hardenconfig.py
-#   )
+set(EXTRA_KCONFIG_TARGET_COMMAND_FOR_hardenconfig
+  ${PROJECT_ROOT}/scripts/kconfig/hardenconfig.py
+  )
+
+add_custom_target(guiconfig ALL)
+add_custom_command(
+  TARGET   guiconfig
+  COMMAND  cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib  
+  COMMAND  ${PYTHON_EXECUTABLE} guiconfig.py 
+)
 
 # foreach(kconfig_target
 #     menuconfig
@@ -80,27 +87,27 @@ set(DOTCONFIG                  ${CMAKE_SOURCE_DIR}/configs/.config)
 #     )
 #   add_custom_target(
 #     ${kconfig_target}
-#     ${CMAKE_COMMAND} -E env
-#     PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
-#     srctree=${ZEPHYR_BASE}
-#     KERNELVERSION=${KERNELVERSION}
-#     KCONFIG_BASE=${PROJECT_BASE}
-#     KCONFIG_CONFIG=${DOTCONFIG}
+#     # ${CMAKE_COMMAND} -E env
+#     # PYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
+#     # srctree=${ZEPHYR_BASE}
+#     # KERNELVERSION=${KERNELVERSION}
+#     # KCONFIG_BASE=${PROJECT_BASE}
+#     # KCONFIG_CONFIG=${DOTCONFIG}
 #     # ARCH=$ENV{ARCH}
 #     # RL_CONFIG_DIR=$ENV{RL_CONFIG_DIR}
 #     # SOC_DIR=$ENV{SOC_DIR}
-#     SHIELD_AS_LIST=$ENV{SHIELD_AS_LIST}
-#     CMAKE_BINARY_DIR=$ENV{CMAKE_BINARY_DIR}
-#     ZEPHYR_TOOLCHAIN_VARIANT=${ZEPHYR_TOOLCHAIN_VARIANT}
-#     TOOLCHAIN_KCONFIG_DIR=${TOOLCHAIN_KCONFIG_DIR}
-#     ARCH_DIR=$ENV{ARCH_DIR}
-#     DEVICETREE_CONF=${DEVICETREE_CONF}
-#     DTS_POST_CPP=${DTS_POST_CPP}
-#     DTS_ROOT_BINDINGS=${DTS_ROOT_BINDINGS}
+#     # SHIELD_AS_LIST=$ENV{SHIELD_AS_LIST}
+#     # CMAKE_BINARY_DIR=$ENV{CMAKE_BINARY_DIR}
+#     # ZEPHYR_TOOLCHAIN_VARIANT=${ZEPHYR_TOOLCHAIN_VARIANT}
+#     # TOOLCHAIN_KCONFIG_DIR=${TOOLCHAIN_KCONFIG_DIR}
+#     # ARCH_DIR=$ENV{ARCH_DIR}
+#     # DEVICETREE_CONF=${DEVICETREE_CONF}
+#     # DTS_POST_CPP=${DTS_POST_CPP}
+#     # DTS_ROOT_BINDINGS=${DTS_ROOT_BINDINGS}
 #     ${PYTHON_EXECUTABLE}
-#     ${EXTRA_KCONFIG_TARGET_COMMAND_FOR_${kconfig_target}}
-#     ${KCONFIG_ROOT}
-#     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/kconfig
+#     # ${EXTRA_KCONFIG_TARGET_COMMAND_FOR_${kconfig_target}}
+#     # ${KCONFIG_ROOT}
+#     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib
 #     USES_TERMINAL
 #     )
 # endforeach()
