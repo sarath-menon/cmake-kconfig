@@ -77,6 +77,7 @@ add_custom_target(menuconfig ALL)
 
 add_custom_command(
   TARGET   guiconfig
+  COMMAND  export KCONFIG_CONFIG=${CMAKE_SOURCE_DIR}/configs/.config
   COMMAND  cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib  
   COMMAND  ${PYTHON_EXECUTABLE} guiconfig.py ${CMAKE_SOURCE_DIR}/configs/Kconfig
 )
@@ -84,6 +85,7 @@ add_custom_command(
 add_custom_command(
   TARGET   menuconfig
   COMMAND  USES_TERMINAL
+  COMMAND  export KCONFIG_CONFIG=${CMAKE_SOURCE_DIR}/configs/.config
   COMMAND  cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib  
   COMMAND  ${PYTHON_EXECUTABLE} menuconfig.py ${CMAKE_SOURCE_DIR}/configs/Kconfig
 )
