@@ -9,9 +9,9 @@ project(kconfig-test
 include(cmake/top.cmake)
 
 if(CONFIG_TEST_OPTION)
-
     message("Config test_option enabled")
-
+else(CONFIG_TEST_OPTION)
+    message("Config test_option disabled")  
 endif()
 
 
