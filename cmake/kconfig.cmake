@@ -76,7 +76,7 @@ add_custom_target(guiconfig ALL)
 add_custom_command(
   TARGET   guiconfig
   COMMAND  cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib  
-  COMMAND  ${PYTHON_EXECUTABLE} guiconfig.py 
+  COMMAND  ${PYTHON_EXECUTABLE} guiconfig.py ${CMAKE_SOURCE_DIR}/configs/Kconfig
 )
 
 # foreach(kconfig_target
