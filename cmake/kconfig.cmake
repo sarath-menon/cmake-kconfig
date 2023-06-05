@@ -57,22 +57,32 @@ set(EXTRA_KCONFIG_TARGET_COMMAND_FOR_hardenconfig
 
 add_custom_target(guiconfig)
 add_custom_target(menuconfig)
+add_custom_target(genconfig)
 
 add_custom_command(
   TARGET menuconfig
   COMMAND
   USES_TERMINAL
-  # COMMAND export KCONFIG_AUTOHEADER=${CMAKE_SOURCE_DIR}/build
+  COMMAND export KCONFIG_AUTOHEADER=${CMAKE_SOURCE_DIR}/build/include/generated;
   COMMAND export KCONFIG_CONFIG=${CMAKE_SOURCE_DIR}/configs/.config
   COMMAND cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib
-  COMMAND ${PYTHON_EXECUTABLE} menuconfig.py ${CMAKE_SOURCE_DIR}/Kconfig)
+  COMMAND ${PYTHON_EXECUTABLE} menuconfig.py ${CMAKE_SOURCE_DIR}/Kconfig
+  COMMAND ${PYTHON_EXECUTABLE} genconfig.py ${CMAKE_SOURCE_DIR}/Kconfig)
 
 add_custom_command(
   TARGET guiconfig
-  # COMMAND export KCONFIG_AUTOHEADER=${CMAKE_SOURCE_DIR}/build
+  COMMAND export KCONFIG_AUTOHEADER=${CMAKE_SOURCE_DIR}/build/include/generated;
   COMMAND export KCONFIG_CONFIG=${CMAKE_SOURCE_DIR}/configs/.config
   COMMAND cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib
-  COMMAND ${PYTHON_EXECUTABLE} guiconfig.py ${CMAKE_SOURCE_DIR}/Kconfig)
+  COMMAND ${PYTHON_EXECUTABLE} guiconfig.py ${CMAKE_SOURCE_DIR}/Kconfig
+  COMMAND ${PYTHON_EXECUTABLE} genconfig.py ${CMAKE_SOURCE_DIR}/Kconfig)
+
+add_custom_command(
+  TARGET genconfig
+  COMMAND export KCONFIG_AUTOHEADER=${CMAKE_SOURCE_DIR}/build/include/generated;
+  COMMAND export KCONFIG_CONFIG=${CMAKE_SOURCE_DIR}/configs/.config
+  COMMAND cd ${CMAKE_SOURCE_DIR}/python_scripts/kconfiglib
+  COMMAND ${PYTHON_EXECUTABLE} genconfig.py ${CMAKE_SOURCE_DIR}/Kconfig)
 
 # foreach(kconfig_target menuconfig guiconfig hardenconfig
 # ${EXTRA_KCONFIG_TARGETS} ) add_custom_target( ${kconfig_target} #

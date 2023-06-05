@@ -113,18 +113,18 @@ only supported for backwards compatibility).
 
     if args.header_path is None:
         if "KCONFIG_AUTOHEADER" in os.environ:
-            kconf.write_autoconf()
-        else:
-            # Kconfiglib defaults to include/generated/autoconf.h to be
-            # compatible with the C tools. 'config.h' is used here instead for
-            # backwards compatibility. It's probably a saner default for tools
-            # as well.
-            conf_path = "build/include/generated";
+            conf_path = os.getenv("KCONFIG_AUTOHEADER")
             conf_file = "/autoconf.h"
             isExist = os.path.exists(conf_path)
             if not isExist:
                 # Create a new directory because it does not exist
                 os.makedirs(conf_path)
+            kconf.write_autoconf(conf_path+conf_file)
+        else:
+            # Kconfiglib defaults to include/generated/autoconf.h to be
+            # compatible with the C tools. 'config.h' is used here instead for
+            # backwards compatibility. It's probably a saner default for tools
+            # as well.
             kconf.write_autoconf(conf_path+conf_file)
     else:
         kconf.write_autoconf(args.header_path)
