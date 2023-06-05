@@ -2,6 +2,6 @@
 #
 # Build and debug options
 #
-# CONFIG_MODULE_1 is not set
+CONFIG_MODULE_1=y
 CONFIG_MODULE_2=y
 # end of Build and debug options
