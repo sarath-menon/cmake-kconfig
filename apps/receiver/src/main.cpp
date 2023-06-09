@@ -49,9 +49,6 @@ int main() {
   int serial_port = open("/tmp/mytty", O_RDWR);
   CRTPPacket packet{};
 
-  // create thread to receive data
-  std::thread thread_obj(receive_data, serial_port);
-
   // Create new termios struct, we call it 'tty' for convention
   struct termios tty;
 
@@ -101,6 +98,9 @@ int main() {
     printf("Error %i from tcsetattr: %s\n", errno, strerror(errno));
     return 1;
   }
+
+  // create thread to receive data
+  std::thread thread_obj(receive_data, serial_port);
 
   // Allocate memory for send buffer, set size according to your needs
   const std::uint8_t sendBuffer[64] = {"selva\n"};
