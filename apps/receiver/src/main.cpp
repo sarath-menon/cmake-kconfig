@@ -56,9 +56,9 @@ int main() {
                         // as any data is received.
   tty.c_cc[VMIN] = sizeof(packet.data);
 
-  // Set in/out baud rate to be 9600
-  cfsetispeed(&tty, B9600);
-  cfsetospeed(&tty, B9600);
+  // Set in/out baud rate to be 115200
+  cfsetispeed(&tty, B115200);
+  cfsetospeed(&tty, B115200);
 
   // Save tty settings, also checking for error
   if (tcsetattr(serial_port, TCSANOW, &tty) != 0) {
