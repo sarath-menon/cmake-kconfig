@@ -21,6 +21,21 @@ void receive_data() {
   }
 }
 
+void send_data(const CRTPPacket &packet) {
+  uint8_t sendBuffer[64]{};
+
+  sendBuffer[0] = packet.header;
+
+  if (packet.size <= CRTP_MAX_DATA_SIZE) {
+    memcpy(&sendBuffer[1], packet.data, sizeof(packet.data));
+
+    std::lock_guard<std::mutex> lock(io_mutex);
+    std::cout << sendBuffer << std::flush;
+  }
+
+  std::this_thread::sleep_for(1ms);
+}
+
 int main() {
 
   // create thread to receive data
@@ -28,7 +43,7 @@ int main() {
 
   for (;;) {
 
-    uint8_t sendBuffer[64]{};
+    // uint8_t sendBuffer[64]{};
 
     CRTPPacket packet{};
     CRTPPacket packet_2{};
@@ -41,16 +56,6 @@ int main() {
     packet.data[2] = 3;
     packet.size = 1;
 
-    sendBuffer[0] = packet.header;
-
-    if (packet.size <= CRTP_MAX_DATA_SIZE) {
-      memcpy(&sendBuffer[1], packet.data, sizeof(packet.data));
-    }
-
-    {
-      std::lock_guard<std::mutex> lock(io_mutex);
-      std::cout << sendBuffer << std::flush;
-    }
-    std::this_thread::sleep_for(1ms);
+    send_data(packet);
   }
 }
