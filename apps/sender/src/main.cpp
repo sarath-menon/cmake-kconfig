@@ -2,10 +2,29 @@
 #include <chrono>
 #include <cstdint>
 #include <iostream>
+#include <mutex>
 #include <thread>
 using namespace std::chrono_literals;
 
+std::mutex io_mutex;
+
+void receive_data() {
+  uint8_t readBuffer[64]{};
+
+  for (;;) {
+
+    {
+      std::lock_guard<std::mutex> lock(io_mutex);
+      std::cin >> readBuffer;
+    }
+    std::this_thread::sleep_for(1ms);
+  }
+}
+
 int main() {
+
+  // create thread to receive data
+  std::thread thread_obj(receive_data);
 
   for (;;) {
     //     std::cout << "Please enter the name of the serial device" << '\n';
@@ -14,7 +33,6 @@ int main() {
     // std::cout << "Character received:" << i << "\r\n";
 
     uint8_t sendBuffer[64]{};
-    uint8_t readBuffer[64]{};
 
     CRTPPacket packet{};
     CRTPPacket packet_2{};
@@ -37,13 +55,16 @@ int main() {
 
     // std::cout << "Data:" << unsigned(packet_2.data[0]) << '\n';
 
-    std::cout << sendBuffer << std::flush;
+    {
+      std::lock_guard<std::mutex> lock(io_mutex);
+      std::cout << sendBuffer << std::flush;
+    }
     std::this_thread::sleep_for(1ms);
 
-    // // receive data
+    // receive data
     // std::cin >> readBuffer;
     // // std::cout << readBuffer << std::flush;
 
-    std::this_thread::sleep_for(1ms);
+    // std::this_thread::sleep_for(1ms);
   }
 }

@@ -14,11 +14,52 @@ using namespace std::chrono_literals;
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h>  // write(), read(), close()
 
+std::mutex io_mutex;
+
+void receive_data(int serial_port) {
+  uint8_t readBuffer[64]{};
+  CRTPPacket packet{};
+
+  // Read bytes. The behaviour of read() (e.g. does it block?,
+  // how long does it block for?) depends on the configuration
+  // settings above, specifically VMIN and VTIME
+  int num_bytes{};
+
+  for (;;) {
+    {
+      std::lock_guard<std::mutex> lock(io_mutex);
+      num_bytes = read(serial_port, &readBuffer, sizeof(readBuffer));
+    }
+
+    // n is the number of bytes read. n may be 0 if no bytes were received,and
+    // can also be -1 to signal an error.
+    if (num_bytes < 0) {
+      std::lock_guard<std::mutex> lock(io_mutex);
+      printf("Error reading: %s", strerror(errno));
+      // return 1;
+    }
+
+    // Here we assume we received ASCII data, but you might be sending raw bytes
+    // (in that case, don't try and print it to the screen like this!)
+    // printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
+
+    memcpy(&packet.data, &readBuffer[1], sizeof(packet.data));
+    {
+      std::lock_guard<std::mutex> lock(io_mutex);
+      std::cout << "Data:" << unsigned(packet.data[1]) << '\n';
+    }
+    std::this_thread::sleep_for(1ms);
+  }
+}
+
 int main() {
   // Open the serial port. Change device path as needed (currently set to an
   // standard FTDI USB-UART cable type device)
   int serial_port = open("/tmp/mytty", O_RDWR);
   CRTPPacket packet{};
+
+  // create thread to receive data
+  std::thread thread_obj(receive_data, serial_port);
 
   // Create new termios struct, we call it 'tty' for convention
   struct termios tty;
@@ -80,38 +121,44 @@ int main() {
   // // call printf() easily.
   // memset(&read_buf, '\0', sizeof(read_buf));
 
-  // Allocate memory for read buffer, set size according to your needs
-  uint8_t readBuffer[64]{};
+  // Allocate memory for send buffer, set size according to your needs
   const std::uint8_t sendBuffer[64] = {"selva\n"};
 
-  for (auto i = 0; i < 10; i++) {
+  for (;;) {
 
-    // Read bytes. The behaviour of read() (e.g. does it block?,
-    // how long does it block for?) depends on the configuration
-    // settings above, specifically VMIN and VTIME
-    int num_bytes = read(serial_port, &readBuffer, sizeof(readBuffer));
+    // // Read bytes. The behaviour of read() (e.g. does it block?,
+    // // how long does it block for?) depends on the configuration
+    // // settings above, specifically VMIN and VTIME
+    // int num_bytes = read(serial_port, &readBuffer, sizeof(readBuffer));
 
-    // n is the number of bytes read. n may be 0 if no bytes were received,and
-    // can also be -1 to signal an error.
-    if (num_bytes < 0) {
-      printf("Error reading: %s", strerror(errno));
-      return 1;
-    }
+    // // n is the number of bytes read. n may be 0 if no bytes were
+    // received,and
+    // // can also be -1 to signal an error.
+    // if (num_bytes < 0) {
+    //   printf("Error reading: %s", strerror(errno));
+    //   return 1;
+    // }
 
-    // Here we assume we received ASCII data, but you might be sending raw bytes
-    // (in that case, don't try and print it to the screen like this!)
-    // printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
+    // // Here we assume we received ASCII data, but you might be sending raw
+    // bytes
+    // // (in that case, don't try and print it to the screen like this!)
+    // // printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
 
-    memcpy(&packet.data, &readBuffer[1], sizeof(packet.data));
-    std::cout << "Data:" << unsigned(packet.data[1]) << '\n';
-
-    std::this_thread::sleep_for(1ms);
-
-    // // write received data back to serial port
-    // write(serial_port, sendBuffer, sizeof(sendBuffer));
-    // std::cout << "Sent Data:" << sendBuffer << '\n';
+    // memcpy(&packet.data, &readBuffer[1], sizeof(packet.data));
+    // std::cout << "Data:" << unsigned(packet.data[1]) << '\n';
 
     // std::this_thread::sleep_for(1ms);
+
+    {
+      std::lock_guard<std::mutex> lock(io_mutex);
+
+      // write received data back to serial port
+      write(serial_port, sendBuffer, sizeof(sendBuffer));
+
+      std::cout << "Sent Data:" << sendBuffer << '\n';
+    }
+
+    std::this_thread::sleep_for(1ms);
   }
   close(serial_port);
   return 0; // success
