@@ -21,6 +21,7 @@ void receive_data(int serial_port) {
   CRTPPacket packet{};
 
   int num_bytes{};
+  int count{};
 
   for (;;) {
     {
@@ -36,10 +37,12 @@ void receive_data(int serial_port) {
 
     memcpy(&packet.data, &readBuffer[1], sizeof(packet.data));
     {
+      std::cout << "Count:" << count << '\n';
       std::lock_guard<std::mutex> lock(io_mutex);
-      std::cout << "Data:" << unsigned(packet.data[1]) << '\n';
+      std::cout << "Received data:" << unsigned(packet.data[1]) << '\n';
     }
     std::this_thread::sleep_for(1ms);
+    count++;
   }
 }
 
@@ -85,9 +88,9 @@ int main() {
   // PRESENT ON LINUX) tty.c_oflag &= ~ONOEOT; // Prevent removal of C-d chars
   // (0x004) in output (NOT PRESENT ON LINUX)
 
-  tty.c_cc[VTIME] = 10; // Wait for up to 1s (10 deciseconds), returning as soon
-                        // as any data is received.
-  tty.c_cc[VMIN] = sizeof(packet.data);
+  tty.c_cc[VTIME] = 0; // Wait for up to 1s (10 deciseconds), returning as soon
+                       // as any data is received.
+  tty.c_cc[VMIN] = 0;
 
   // Set in/out baud rate to be 115200
   cfsetispeed(&tty, B115200);
