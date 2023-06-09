@@ -27,10 +27,6 @@ int main() {
   std::thread thread_obj(receive_data);
 
   for (;;) {
-    //     std::cout << "Please enter the name of the serial device" << '\n';
-    // char i;
-    // std::cin >> i;
-    // std::cout << "Character received:" << i << "\r\n";
 
     uint8_t sendBuffer[64]{};
 
@@ -51,20 +47,10 @@ int main() {
       memcpy(&sendBuffer[1], packet.data, sizeof(packet.data));
     }
 
-    // memcpy(&packet_2.data, &sendBuffer[1], sizeof(packet.data));
-
-    // std::cout << "Data:" << unsigned(packet_2.data[0]) << '\n';
-
     {
       std::lock_guard<std::mutex> lock(io_mutex);
       std::cout << sendBuffer << std::flush;
     }
     std::this_thread::sleep_for(1ms);
-
-    // receive data
-    // std::cin >> readBuffer;
-    // // std::cout << readBuffer << std::flush;
-
-    // std::this_thread::sleep_for(1ms);
   }
 }
