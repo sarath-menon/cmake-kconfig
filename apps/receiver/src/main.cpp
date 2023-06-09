@@ -36,6 +36,8 @@ void receive_data(int serial_port) {
     }
 
     memcpy(&packet.data, &readBuffer[1], sizeof(packet.data));
+    // auto packet = reinterpret_cast<CRTPPacket *>(&readBuffer[1]);
+
     {
       std::cout << "Count:" << count << '\n';
       std::lock_guard<std::mutex> lock(io_mutex);
