@@ -14,6 +14,7 @@ int main() {
     // std::cout << "Character received:" << i << "\r\n";
 
     uint8_t sendBuffer[64]{};
+    uint8_t readBuffer[64]{};
 
     CRTPPacket packet{};
     CRTPPacket packet_2{};
@@ -36,7 +37,12 @@ int main() {
 
     // std::cout << "Data:" << unsigned(packet_2.data[0]) << '\n';
 
-    std::cout << sendBuffer;
+    std::cout << sendBuffer << std::flush;
+    std::this_thread::sleep_for(1ms);
+
+    // // receive data
+    // std::cin >> readBuffer;
+    // // std::cout << readBuffer << std::flush;
 
     std::this_thread::sleep_for(1ms);
   }

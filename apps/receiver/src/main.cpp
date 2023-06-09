@@ -1,8 +1,12 @@
 // C library headers
 #include "crtp.h"
+#include <chrono>
+#include <cstdint>
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <thread>
+using namespace std::chrono_literals;
 
 // Linux headers
 #include <errno.h>   // Error integer and strerror() function
@@ -78,6 +82,7 @@ int main() {
 
   // Allocate memory for read buffer, set size according to your needs
   uint8_t readBuffer[64]{};
+  const std::uint8_t sendBuffer[64] = {"selva\n"};
 
   for (auto i = 0; i < 10; i++) {
 
@@ -86,7 +91,7 @@ int main() {
     // settings above, specifically VMIN and VTIME
     int num_bytes = read(serial_port, &readBuffer, sizeof(readBuffer));
 
-    // n is the number of bytes read. n may be 0 if no bytes were received, and
+    // n is the number of bytes read. n may be 0 if no bytes were received,and
     // can also be -1 to signal an error.
     if (num_bytes < 0) {
       printf("Error reading: %s", strerror(errno));
@@ -98,8 +103,15 @@ int main() {
     // printf("Read %i bytes. Received message: %s", num_bytes, read_buf);
 
     memcpy(&packet.data, &readBuffer[1], sizeof(packet.data));
-
     std::cout << "Data:" << unsigned(packet.data[1]) << '\n';
+
+    std::this_thread::sleep_for(1ms);
+
+    // // write received data back to serial port
+    // write(serial_port, sendBuffer, sizeof(sendBuffer));
+    // std::cout << "Sent Data:" << sendBuffer << '\n';
+
+    // std::this_thread::sleep_for(1ms);
   }
   close(serial_port);
   return 0; // success
